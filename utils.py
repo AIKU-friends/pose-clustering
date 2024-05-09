@@ -22,6 +22,30 @@ def norm_pose(pose_keypoints_series):
         norm_pose_keypoints.append(point)
     return norm_pose_keypoints
 
+def preprocess_keypoints_for_clustering(data_path):
+    data_path = './affordance_data/trainlist.txt'
+    with open(data_path, 'r') as f:
+        data_list = list(f.readlines())
+    data_list = [x.split(' ') for x in data_list]
+
+    image_name_list = []
+    keypoints_list = []
+    norm_keypoints_list = []
+    for data in data_list:
+        image_name = data[0]
+        keypoint = data[1:-3]
+        keypoint = [eval(x) for x in keypoint]
+        image_name_list.append(image_name)
+        keypoints_list.append(keypoint)
+        norm_keypoints_list.append(norm_pose(keypoint))
+    return image_name_list, keypoints_list, np.array(norm_keypoints_list)
+
+def get_cluster_center_by_choice(cluster_centers, choice):
+    filtered_centers = []
+    for label in choice:
+        filtered_centers.append(cluster_centers[label])
+    return np.array(filtered_centers)
+
 def write_cluster_centers(file_path, cluster_center_list):
     with open(file_path, 'a') as f:
         for cluster_center in cluster_center_list:
